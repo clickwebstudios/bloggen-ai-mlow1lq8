@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bloggen-ai-mlow1lq8-app
+    restart: unless-stopped
+    ports:
+      - "3546:3000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/bloggen-ai-mlow1lq8?schema=public
+      - NEXTAUTH_URL=https://bloggen-ai-mlow1lq8.namebloom.co
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - bloggen-ai-mlow1lq8-network
+
+  db:
+    image: postgres:16-alpine
+    container_name: bloggen-ai-mlow1lq8-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=bloggen-ai-mlow1lq8
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bloggen-ai-mlow1lq8-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+
+networks:
+  bloggen-ai-mlow1lq8-network:
+    driver: bridge
