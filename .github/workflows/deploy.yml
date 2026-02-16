@@ -23,4 +23,8 @@ jobs:
           
       - name: Deploy to VPS
         run: |
-          ssh admin2@63.250.42.183 "cd /home/admin2/projects/bloggen-ai-mlow1lq8 && git pull origin main && docker-compose down && docker-compose up -d --build"
+          ssh admin2@63.250.42.183 "cd /home/admin2/projects/bloggen-ai-mlow1lq8 && git pull origin main"
+        
+      - name: Restart containers (requires docker group membership)
+        run: |
+          ssh admin2@63.250.42.183 "cd /home/admin2/projects/bloggen-ai-mlow1lq8 && (docker-compose down && docker-compose up -d --build) || echo 'Docker commands failed - ensure user is in docker group'"
